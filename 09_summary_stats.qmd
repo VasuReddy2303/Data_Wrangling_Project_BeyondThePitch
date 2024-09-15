@@ -1,0 +1,609 @@
+---
+title: '9: Summary statistics'
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.16.1
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
+See <https://bellecp.github.io/597-Data-Wrangling-Spring-2024/project.html#computation-of-meaningful-summary-statistics>.
+Describe your contributions below.
+* * *
+
+### Some of the key features to analyse are:
+##### 1) Most and Least Goals scoring team
+##### 2) Most and Least Goals conceeded by a team
+##### 3) Team with the highest and the least Goal Difference
+##### 4) Teams with most wins and losses
+##### 5) Teams with most home and away wins
+##### 6) Teams with most home and away losses
+##### 7) Teams with most Disciplinary misconducts, i.e. Teams with most yellow and red cards
+
+### Install required libraries
+
+```{python}
+import pandas as pd
+# import dask as dd
+import numpy as np
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+import plotly.express as px
+```
+
+### Import the data 
+
+```{python}
+df = pd.read_csv(r'Premier_league_Data_Cleaned_05.csv')
+pd.set_option('display.max_columns', None)
+# df.tail()
+# df.iloc[706]
+```
+
+Division = E0 (First/Topflight Division)​
+
+Total Teams = 20 per season​
+
+Total Matches= 760 per season​
+
+Total home games = Total away games =  380 per season​
+
+Total Matches per Team = 38
+
+```{python}
+info = df.info()
+# print(info)
+total_rows = df.shape[0]
+total_columns = df.shape[1]
+# total_rows
+print('Total Rows in the DataFrame : ', total_rows)
+print('Total COlumns in the DataFrame : ', total_columns)
+
+# Get total number of columns and their data types
+# cols = df.columns
+# type = [df[i].dtype for i in cols]
+# datatypes = {cols[i]:str(type[i]) for i in range(len(cols))}
+# datatypes
+```
+
+```{python}
+# # Get counts of non-null values per column
+# non_null_counts = df.count()
+
+# # Create bar chart using Plotly Express
+# fig = px.bar(non_null_counts, x=non_null_counts.index, y=non_null_counts.values,
+#              labels={'x': 'Column', 'y': 'Non-Null Count'},
+#              title='Non-Null Value Counts per Column',
+#              color_discrete_sequence=['#1f77b4'] * len(non_null_counts))  # Custom color for bars
+
+# # Update layout for aesthetics
+# fig.update_layout(
+#     plot_bgcolor='white',  # White background
+#     paper_bgcolor='white',  # White paper background for high contrast
+#     font=dict(color='black'),  # Black color for labels
+# )
+
+# fig.show()
+```
+
+```{python}
+# Get non-null values per column
+non_null_values = df.notnull().sum()
+
+# Create violin plot using Plotly Express
+fig = px.violin(x=non_null_values.index, y=non_null_values.values,
+                labels={'x': 'Column', 'y': 'Non-Null Count'},
+                title='Distribution of Non-Null Values per Column',
+                points="all",  # Show all data points
+                color_discrete_sequence=['#1f77b4'] * len(non_null_values))  # Custom color for violins
+
+# Update layout for aesthetics
+fig.update_layout(
+    plot_bgcolor='white',  # White background
+    paper_bgcolor='white',  # White paper background for high contrast
+    font=dict(color='black'),  # Black color for labels
+)
+
+fig.show()
+```
+
+### GENERAL STATISTICAL SUMMARY ANALYSIS
+
+```{python}
+total_goals = df.groupby(['Year'],as_index  =False)['Total_Goals_Scored'].sum()
+# total_goals.columns
+
+px.defaults.template = 'plotly_dark'
+# Create the colored bar chart using Plotly Express
+fig = px.bar(total_goals, x='Year', y='Total_Goals_Scored', color='Total_Goals_Scored', 
+             title='Goals Scored by Year')
+
+fig.update_xaxes(title='Year')
+fig.update_yaxes(title='Goals Scored', tickmode='linear', dtick=100)
+
+
+# Show the plot
+fig.show()
+
+
+# Set the dark template
+px.defaults.template = 'plotly_dark'
+# px.defaults.template = 'plotly_darkgrid'
+
+# Create the colorful line plot using Plotly Express
+fig = px.line(total_goals, x='Year', y='Total_Goals_Scored', title='Trend of Goals Scored Over Seasons',
+              color_discrete_sequence=px.colors.qualitative.Plotly)
+
+# Update axis labels
+fig.update_xaxes(title='Season')
+fig.update_yaxes(title='Total Goals Scored')
+
+# Show the plot
+fig.show()
+```
+
+```{python}
+df['Total_Yellow_Cards'] = df['Home_Team_Yellow_Cards'] + df['Away_Team_Yellow_Cards']
+df['Total_Red_Cards'] = df['Home_Team_Red_Cards'] + df['Away_Team_Red_Cards']
+discipline  = df.groupby(['Year'], as_index = False)[['Total_Yellow_Cards','Total_Red_Cards']].sum()
+
+px.defaults.template = 'plotly_dark'
+# Create the colored bar chart using Plotly Express
+fig = px.bar(discipline, x = 'Year', y = 'Total_Yellow_Cards', color = 'Total_Yellow_Cards', 
+             title = 'Yellow Cards Every Season')
+
+fig.update_xaxes(title = 'Season')
+fig.update_yaxes(title = 'Total_Yellow_Cards', tickmode='linear', dtick=100)
+
+
+# Show the plot
+fig.show()
+
+# Set the dark template
+px.defaults.template = 'plotly_dark'
+# px.defaults.template = 'plotly_darkgrid'
+
+# Create the colorful line plot using Plotly Express
+fig = px.line(discipline, x='Year', y='Total_Yellow_Cards', title='Trend of Yellow Cards Over Seasons',
+              color_discrete_sequence=px.colors.qualitative.Plotly)
+
+# Update axis labels
+fig.update_xaxes(title='Season')
+fig.update_yaxes(title='Total Yellow Cards')
+
+# Show the plot
+fig.show()
+```
+
+```{python}
+px.defaults.template = 'plotly_dark'
+# Create the colored bar chart using Plotly Express
+fig = px.bar(discipline, x = 'Year', y = 'Total_Red_Cards', color = 'Total_Red_Cards', 
+             title = 'Red Cards Every Season')
+
+fig.update_xaxes(title = 'Season')
+fig.update_yaxes(title = 'Total_Red_Cards', tickmode='linear', dtick=100)
+
+
+# Show the plot
+fig.show()
+
+# Set the dark template
+px.defaults.template = 'plotly_dark'
+# px.defaults.template = 'plotly_darkgrid'
+
+# Create the colorful line plot using Plotly Express
+fig = px.line(discipline, x='Year', y='Total_Red_Cards', title='Trend of Red Cards Over Seasons',
+              color_discrete_sequence=px.colors.qualitative.Plotly)
+
+# Update axis labels
+fig.update_xaxes(title='Season')
+fig.update_yaxes(title='Total Red Cards')
+
+# Show the plot
+fig.show()
+```
+
+```{python}
+# results = df.groupby(['Year','Result'], as_index = False)['Result'].sum()
+results = df[df['Result'] == 'Draw'][['Year','Result']]
+draws_per_season = results.groupby('Year').size().reset_index(name='Number_of_Draws')
+draws_per_season
+
+
+px.defaults.template = 'plotly_dark'
+# Create the colored bar chart using Plotly Express
+fig = px.bar(draws_per_season, x = 'Year', y = 'Number_of_Draws', color = 'Number_of_Draws', 
+             title = 'Number of Draws Every Season')
+
+fig.update_xaxes(title = 'Season')
+fig.update_yaxes(title = 'Number of Draws', tickmode='linear', dtick=100)
+
+
+# Show the plot
+fig.show()
+
+# Set the dark template
+px.defaults.template = 'plotly_dark'
+# px.defaults.template = 'plotly_darkgrid'
+
+# Create the colorful line plot using Plotly Express
+fig = px.line(draws_per_season, x='Year', y='Number_of_Draws', title='Trend Matches Draws Over Seasons',
+              color_discrete_sequence=px.colors.qualitative.Plotly)
+
+# Update axis labels
+fig.update_xaxes(title='Season')
+fig.update_yaxes(title='Total number Of Draws Season')
+
+# Show the plot
+fig.show()
+```
+
+### 1. Most and Least Goal scoring team
+
+```{python}
+## Teams with most goals scored accorss all seasons
+df_goals_scored_home = df[['Year','Home_Team','Full_Time_Home_Goals']].rename(columns = {'Home_Team' : 'Team','Full_Time_Home_Goals':'Goals_Scored'})
+df_goals_scored_away = df[['Year','Away_Team','Full_Time_Away_Goals']].rename(columns = {'Away_Team' : 'Team','Full_Time_Away_Goals':'Goals_Scored'})
+df_goals_scored = pd.concat([df_goals_scored_home,df_goals_scored_away])
+df_goals_scored = df_goals_scored.groupby(['Year','Team'],as_index = False)['Goals_Scored'].sum()
+highest_scoring_team = df_goals_scored.groupby('Team')['Goals_Scored'].sum()
+team_with_highest_goals = highest_scoring_team.idxmax()
+highest_goals_scored = highest_scoring_team.max()
+
+df_goals_scored.to_csv(r'09_01_Goals_Scored.csv', index = False)
+
+print(f"The team with the highest goals scored is {team_with_highest_goals} with {highest_goals_scored} goals.")
+```
+
+```{python}
+lowest_scoring_team = df_goals_scored.groupby('Team')['Goals_Scored'].sum()
+team_with_lowest_goals = lowest_scoring_team.idxmin()
+lowest_goals_scored = lowest_scoring_team.min()
+
+print(f"The team with the least goals scored is {team_with_lowest_goals} with {lowest_goals_scored} goals.")
+```
+
+```{python}
+# Sort the data by 'Year' and 'Goals_Scored' in descending order
+df_goals_scored_sorted = df_goals_scored.sort_values(by=['Year', 'Goals_Scored'], ascending=[True, False])
+
+# Get the top 3 teams with highest goals scored for each year
+top_3_teams_yearwise = df_goals_scored_sorted.groupby('Year').head(3)
+top_3_teams_yearwise
+```
+
+```{python}
+#Get the top 3 teams with Least goals scored for each year
+bottom_3_teams_yearwise = df_goals_scored_sorted.groupby('Year').tail(3)
+bottom_3_teams_yearwise
+```
+
+```{python}
+# # Get the top 5 teams with the highest goals scored each year
+# top_5_teams_yearwise = df_goals_scored.groupby('Year').apply(lambda x: x.nlargest(5, 'Goals_Scored')).reset_index(drop=True)
+
+# # Plotting live visualization for top 5 teams with goals scored year-wise
+# sns.set(style="whitegrid")
+# plt.figure(figsize=(20, 12))
+# sns.barplot(x='Year', y='Goals_Scored', hue='Team', data=top_5_teams_yearwise)
+# plt.title('Top 5 Teams with Goals Scored Year-wise')
+# plt.xlabel('Year')
+# plt.ylabel('Goals Scored')
+# plt.legend(title='Team', loc='upper right')
+# plt.show()
+```
+
+```{python}
+## Create dataframe for obtaining goals scored metric
+
+df_home = df[['Year','Home_Team','Full_Time_Home_Goals']].rename(columns = {'Home_Team' : 'Team', 'Full_Time_Home_Goals' : 'Goals_Scored'})
+df_away = df[['Year','Away_Team','Full_Time_Away_Goals']].rename(columns = {'Away_Team' : 'Team', 'Full_Time_Away_Goals' : 'Goals_Scored'})
+df_goals = pd.concat([df_home,df_away])
+df_goals_scored = df_goals.groupby(['Year','Team'],as_index=False)[['Goals_Scored']].sum()
+df_goals_scored
+```
+
+```{python}
+import pandas as pd
+
+# Assuming df_goals is your DataFrame with columns Year, Team, and Goals_Scored
+
+# Group by 'Year' and apply a function to get the top 5 teams with most goals scored for each year
+top_5_teams_yearwise = df_goals_scored.groupby(['Year']).apply(lambda group: group.nlargest(5, 'Goals_Scored'))
+
+# Reset the index of the resulting DataFrame
+top_5_teams_yearwise = top_5_teams_yearwise.reset_index(drop=True)[['Year', 'Team', 'Goals_Scored']]
+club_count = top_5_teams_yearwise.groupby('Team',as_index = False).count()[['Team','Year']].sort_values(by = "Year",ascending=False)
+club_count
+# Display the top 5 teams with most goals scored for each year
+# print(top_5_teams_yearwise[['Year', 'Team', 'Goals_Scored']])
+# top_5_teams_yearwise
+```
+
+```{python}
+# The bottom 5 teams with least goals scored for each year
+bottom_5_teams_yearwise = df_goals_scored.groupby('Year').apply(lambda group: group.nsmallest(5, 'Goals_Scored'))
+
+# Reset the index of the resulting DataFrame
+bottom_5_teams_yearwise = bottom_5_teams_yearwise.reset_index(drop=True)[['Year', 'Team', 'Goals_Scored']]
+club_count = bottom_5_teams_yearwise.groupby('Team',as_index = False).count()[['Team','Year']].sort_values(by = "Year",ascending=False)
+club_count
+```
+
+### 2) Most and Least Goals conceeded by a team
+
+```{python}
+## Prepare the Data for calculation of Goals Conceeded
+home_conceded = df[['Year','Home_Team','Full_Time_Away_Goals']].rename(columns = {'Home_Team':'Team', 'Full_Time_Away_Goals' : 'Goals_Conceded'})
+away_conceded = df[['Year','Away_Team','Full_Time_Home_Goals']].rename(columns = {'Away_Team':'Team', 'Full_Time_Home_Goals' : 'Goals_Conceded'})
+df_conceded = pd.concat([home_conceded,away_conceded])
+df_conceded = df_conceded.groupby(['Year','Team'], as_index = False)['Goals_Conceded'].sum()
+df_conceded.to_csv(r"09_02_Goals_Conceded.csv", index = False)
+df_conceded
+```
+
+```{python}
+# Sort the DataFrame in ascending order based on 'Goals_Conceded' within each 'Year'
+df_conceded_sorted = df_conceded.sort_values(by=['Year', 'Goals_Conceded'])
+
+# Create a new DataFrame to store the top 3 teams with least goals conceded for each year
+top_3_teams_least_conceded = pd.DataFrame()
+
+# Iterate over each year and select the top 3 teams with least goals conceded
+for year, group in df_conceded_sorted.groupby('Year'):
+    top_3_teams_year = group.head(3)  # Select the top 3 teams for the current year
+    top_3_teams_least_conceded = pd.concat([top_3_teams_least_conceded, top_3_teams_year])
+
+# Display the top 3 teams with least goals conceded for each year
+print(top_3_teams_least_conceded[['Year', 'Team', 'Goals_Conceded']])
+```
+
+```{python}
+# Sort the DataFrame in ascending order based on 'Goals_Conceded' within each 'Year'
+df_conceded_sorted = df_conceded.sort_values(by=['Year', 'Goals_Conceded'])
+
+# Create a new DataFrame to store the top 3 teams with least goals conceded for each year
+top_3_teams_least_conceded = pd.DataFrame()
+
+# Iterate over each year and select the top 3 teams with least goals conceded
+for year, group in df_conceded_sorted.groupby('Year'):
+    top_3_teams_year = group.tail(3)  # Select the top 3 teams for the current year
+    top_3_teams_least_conceded = pd.concat([top_3_teams_least_conceded, top_3_teams_year])
+
+# Display the top 3 teams with least goals conceded for each year
+print(top_3_teams_least_conceded[['Year', 'Team', 'Goals_Conceded']])
+```
+
+### 3.Team with the highest and the least Goal Difference
+
+```{python}
+## Teams with Highest Goal Difference
+
+goal_difference_home = df.groupby(['Year','Home_Team'],as_index = False)['Goal_Difference_Home_Team'].sum()\
+                    .rename(columns = {'Goal_Difference_Home_Team' : 'Goal_Difference', 'Home_Team':'Team'})
+goal_difference_away = df.groupby(['Year','Away_Team'],as_index = False)['Goal_Difference_Away_Team'].sum()\
+                    .rename(columns = {'Goal_Difference_Away_Team' : 'Goal_Difference', 'Away_Team':'Team'})
+goal_difference = pd.concat([goal_difference_home,goal_difference_away,])
+
+## Save the intermediate file for 
+goal_difference = goal_difference.groupby(['Year','Team'], as_index = False)['Goal_Difference'].sum()
+goal_difference.to_csv(r"..\09_03_Goal_Difference.csv", index = False)
+
+highest_goal_difference = pd.DataFrame()
+lowest_goal_difference = pd.DataFrame()
+years = goal_difference['Year'].unique().tolist()
+for year in years:
+    # Highest GD
+    df_temp = goal_difference[goal_difference['Year'] == year].sort_values(by = ['Goal_Difference'],ascending = False).head(3)
+    highest_goal_difference = pd.concat([highest_goal_difference,df_temp])
+    # Lowest GD
+    df_temp = goal_difference[goal_difference['Year'] == year].sort_values(by = ['Goal_Difference'],ascending = True).head(3)
+    lowest_goal_difference = pd.concat([lowest_goal_difference,df_temp])
+
+
+highest_goal_difference
+```
+
+```{python}
+lowest_goal_difference
+```
+
+### 4) Teams with most wins and losses
+
+```{python}
+### Top 5 Teams with most wins every season
+
+df_wins = df[['Year','Winner']]
+# df_wins = df.groupby(['Year','Winner'],as_index =  False)['Winner'].count()
+df_wins = df_wins.groupby(['Year', 'Winner']).size().reset_index(name='Wins').sort_values(by = ['Wins'],ascending = False)
+# df_wins = df_wins[df_wins['Winner'] != 'Draw'].groupby(['Year','Winner'],as_index = False)['Wins'].sum()
+df_wins = df_wins[df_wins['Winner'] != 'Draw']
+df_wins.to_csv(r"09_04_Wins.csv", index = False)
+df_wins
+```
+
+```{python}
+df_most_winning_teams = pd.DataFrame()
+# years = goal_difference['Year'].unique().tolist()
+for year in years:
+    df_temp = df_wins[df_wins['Year'] == year].sort_values(by = ['Wins'],ascending = False).head(3)
+    df_most_winning_teams = pd.concat([df_most_winning_teams,df_temp])
+df_most_winning_teams
+```
+
+```{python}
+##  Top 5 Teams with least wins every season
+
+df_least_winning_teams = pd.DataFrame()
+# years = goal_difference['Year'].unique().tolist()
+for year in years:
+    df_temp = df_wins[df_wins['Year'] == year].sort_values(by = ['Wins'],ascending = True).head(3)
+    df_least_winning_teams = pd.concat([df_least_winning_teams,df_temp])
+
+df_least_winning_teams
+```
+
+### 5.Teams with most home and away wins
+
+- Most Home Wins
+- Least Home Wins
+- Most Home Wins Every Season
+- Most Away Wins
+- Least Away Wins
+- Most Away Wins Every Season
+
+```{python}
+## Team with the most Home wins
+
+home_wins_df  = df[df['Result'] == 'Home Team Win'].groupby(['Year', 'Winner', 'Result']).size().reset_index(name='Wins')
+home_wins_df[['Year', 'Winner', 'Wins']].to_csv(r'09_05_Home_Wins.csv', index = False)
+home_wins_df_overall = home_wins_df.groupby(['Winner'], as_index = False)['Wins'].sum().sort_values(by = ['Wins'], ascending = False)
+team_with_most_home_wins = home_wins_df_overall['Winner'].iloc[0]
+print(f'Team with the most Home Wins : {team_with_most_home_wins}')
+home_wins_df_overall.head(10)
+```
+
+```{python}
+## Team with the Least Home wins
+
+home_wins_df_overall = home_wins_df.groupby(['Winner'], as_index = False)['Wins'].sum().sort_values(by = ['Wins'], ascending = True)
+team_with_least_home_wins = home_wins_df_overall['Winner'].iloc[0]
+print(f'Team with the Least Home Wins : {team_with_least_home_wins}')
+home_wins_df_overall.head(10)
+```
+
+```{python}
+### Teams with Most Home Wins Every Season
+home_wins_df_year_wise  = df[df['Result'] == 'Home Team Win'].groupby(['Year', 'Winner', 'Result']).size().reset_index(name='Wins')
+home_wins_df_overall = home_wins_df.groupby(['Year','Winner'], as_index = False)['Wins'].sum().sort_values(by = ['Year'], ascending = False)
+
+home_wins_season = pd.DataFrame()
+for year in years:
+    df_temp = home_wins_df_overall[home_wins_df_overall['Year'] == year].sort_values(by = ['Wins'], ascending = False).head(3)
+    home_wins_season = pd.concat([home_wins_season,df_temp])
+home_wins_season
+```
+
+```{python}
+### Teams with Most Away Wins Overall
+
+away_wins_df  = df[df['Result'] == 'Away Team Win'].groupby(['Year', 'Winner', 'Result']).size().reset_index(name='Wins')
+away_wins_df_overall = away_wins_df.groupby(['Winner'], as_index = False)['Wins'].sum().sort_values(by = ['Wins'], ascending = False)
+team_with_most_away_wins = away_wins_df_overall['Winner'].iloc[0]
+print(f'Team with the most Away Wins : {team_with_most_away_wins}')
+away_wins_df_overall.head(10)
+```
+
+```{python}
+### Teams with Least Away Wins overall
+
+away_wins_df  = df[df['Result'] == 'Away Team Win'].groupby(['Year', 'Winner', 'Result']).size().reset_index(name='Wins')
+away_wins_df_overall = away_wins_df.groupby(['Winner'], as_index = False)['Wins'].sum().sort_values(by = ['Wins'], ascending = True)
+team_with_least_away_wins = away_wins_df_overall['Winner'].iloc[0]
+print(f'Team with the Least Away Wins : {team_with_least_away_wins}')
+away_wins_df_overall.head(10)
+```
+
+```{python}
+### Teams with Most Away Wins Every Season
+away_wins_df_year_wise  = df[df['Result'] == 'Away Team Win'].groupby(['Year', 'Winner', 'Result']).size().reset_index(name='Wins')
+away_wins_df_overall = away_wins_df_year_wise.groupby(['Year','Winner'], as_index = False)['Wins'].sum().sort_values(by = ['Wins'], ascending = True)
+
+away_wins_season = pd.DataFrame()
+for year in years:
+    df_temp = away_wins_df_overall[away_wins_df_overall['Year'] == year].sort_values(by = ['Wins'], ascending = False).head(3)
+    away_wins_season = pd.concat([away_wins_season,df_temp])
+away_wins_season
+```
+
+###  6) Teams with most home and away losses
+
+- Most Home Losses
+- Most Home Losses Every Season
+- Most Away Losses
+- Most Away Losses Every Season
+
+```{python}
+## Team with the most Home Loses
+
+home_losses_df  = df[df['Result'] == 'Away Team Win'].groupby(['Year', 'Home_Team', 'Result']).size().reset_index(name='Losses').rename(columns = {'Home_Team':'Team'})
+home_losses_df.to_csv(r"09_06_Home_losses.csv", index = False)
+home_losses_df_overall = home_losses_df.groupby(['Team'], as_index = False)['Losses'].sum().sort_values(by = ['Losses'], ascending = False)
+# team_with_most_home_losses = home_losses_df_overall['Team'].iloc[0]
+print(f'Team with the most Home Losses :')
+home_losses_df_overall.sort_values(by = ['Losses'], ascending  = False).head()
+```
+
+```{python}
+### Teams with Least Home Losses
+# home_losses_df_overall.sort_values(by = ['Count'], ascending  = True).head()
+```
+
+```{python}
+### Teams with Most Home Losses 
+home_losses_df_overall = home_losses_df.groupby(['Year','Team'], as_index = False)['Losses'].sum().sort_values(by = ['Losses'], ascending = False)
+# team_with_most_home_losses = home_losses_df_overall['Team'].iloc[0]
+print(f'Team with the most Home Losses every Season:')
+# home_losses_df_overall.sort_values(by = ['Count'], ascending  = False)
+# Define a custom filtering function to select only 3 rows from each group
+def filter_top_3_rows(group):
+    return group.nlargest(3, 'Losses')
+
+# Apply the custom filtering function to the DataFrame using groupby and apply
+home_losses_df_overall_season_wise = home_losses_df_overall.groupby('Year', group_keys=False).apply(filter_top_3_rows)
+home_losses_df_overall_season_wise
+```
+
+```{python}
+## Team with Away Loses
+
+away_losses_df  = df[df['Result'] == 'Home Team Win'].groupby(['Year', 'Away_Team', 'Result']).size().reset_index(name='Losses').rename(columns = {'Away_Team':'Team'})
+away_losses_df_overall = away_losses_df.groupby(['Team'], as_index = False)['Losses'].sum().sort_values(by = ['Losses'], ascending = False)
+# team_with_most_home_losses = home_losses_df_overall['Team'].iloc[0]
+print(f'Team with most Away Losses :')
+away_losses_df_overall.sort_values(by = ['Losses'], ascending  = False).head()
+```
+
+```{python}
+### Teams with Most Away Losses every season
+
+away_losses_df_overall = away_losses_df.groupby(['Year','Team'], as_index = False)['Losses'].sum().sort_values(by = ['Losses'], ascending = False)
+# team_with_most_home_losses = home_losses_df_overall['Team'].iloc[0]
+print(f'Team with the most Home Losses every Season:')
+# home_losses_df_overall.sort_values(by = ['Count'], ascending  = False)
+# Define a custom filtering function to select only 3 rows from each group
+def filter_top_3_rows(group):
+    return group.nlargest(3, 'Losses')
+
+# Apply the custom filtering function to the DataFrame using groupby and apply
+away_losses_df_overall_season_wise = away_losses_df_overall.groupby('Year', group_keys=False).apply(filter_top_3_rows)
+away_losses_df_overall_season_wise
+```
+
+### 7. Teams with most Disciplinary misconducts, i.e. Teams with most yellow and red cards
+
+```{python}
+## Teams with most Yellow Cards  overall
+
+df_cards = df.groupby(['Year','Home_Team'],as_index = False)[['Home_Team_Yellow_Cards','Home_Team_Red_Cards']].sum()\
+                .rename(columns = {'Home_Team_Yellow_Cards' : 'Yellow_Cards', 'Home_Team_Red_Cards' : 'Red_Cards','Home_Team' : 'Team'})
+df_cards.to_csv(r"09_07_Discipline.csv", index = False)
+# df_cards
+# Get the top 3 teams with highest yellow cards for each year
+top_3_yellow_cards = df_cards.groupby('Year').apply(lambda group: group.nlargest(3, 'Yellow_Cards')).reset_index(drop=True)[['Year','Team','Yellow_Cards']]
+top_3_yellow_cards
+```
+
+```{python}
+### Top 3 Teams with most red cards every season 
+
+top_3_red_cards = df_cards.groupby('Year').apply(lambda group: group.nlargest(3, 'Yellow_Cards')).reset_index(drop=True)[['Year','Team','Red_Cards']]
+top_3_red_cards
+```

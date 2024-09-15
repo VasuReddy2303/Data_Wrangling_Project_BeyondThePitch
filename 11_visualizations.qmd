@@ -1,0 +1,276 @@
+---
+title: '11: Visualizations'
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.16.1
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
+<https://bellecp.github.io/597-Data-Wrangling-Spring-2024/project.html#around-4-6-or-more-visualizations-related-to-the-dataset>
+Describe your contributions below.
+
+Some visualizations:
+1) Different teams to win the premier league in the last 10 years.
+2) How home stadium effects the results of the teams.
+3) Top teams who win while conceeding first.
+
+* * *
+
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+# import seaborn as sns
+import plotly.express as px
+import plotly.graph_objects as go
+```
+
+```{python}
+### 1. Distribution of Draws, Wins and Losses
+
+df = pd.read_csv(r'Premier_league_Data_Cleaned_05.csv')
+pd.set_option('display.max_columns', None)
+df.tail()
+# df.iloc[706]
+```
+
+```{python}
+### Group the data by the changinf of the result:
+# results = df[['Year','Result']].groupby(['Year','Result'],as_index = False)['Result'].count().reset_index()
+results = df.groupby(['Year', 'Result']).size().reset_index(name='Result_Count')
+
+fig = px.pie(results, values='Result_Count', names='Result', title='Distribution of Results Overall')
+
+# Set the template to 'plotly_dark' for a dark background
+fig.update_layout(template='plotly_dark')
+
+# Define custom colors for each result category
+colors = ['#d62728', '#ff7f0e', '#9467bd']  # Red, Orange, Green, , Purple
+
+# Apply custom colors to the pie chart
+fig.update_traces(marker=dict(colors=colors))
+```
+
+### Insights 
+
+1. **Home Field Advantage**: Home teams have a higher win percentage (45%) than away teams (32%), indicating a significant advantage for teams playing at home.
+
+2. **Competitive Matches**: The lower draw percentage (23%) suggests a competitive balance, with teams often striving for wins rather than settling for draws, enhancing the excitement of the matches.
+
+```{python}
+accuracy_home = df[['Year','Home_Team','Home_Team_Shots_On_Target','Full_Time_Home_Goals']]\
+                    .rename(columns = {'Home_Team':'Team','Home_Team_Shots_On_Target':'Shots_on_Target','Full_Time_Home_Goals':'Goals_Scored'})
+# accuracy_home
+accuracy_away = df[['Year','Away_Team','Away_Team_Shots_On_Target','Full_Time_Away_Goals']]\
+                    .rename(columns = {'Away_Team':'Team','Away_Team_Shots_On_Target':'Shots_on_Target','Full_Time_Away_Goals':'Goals_Scored'})
+# accuracy_away
+accuracy = pd.concat([accuracy_home,accuracy_away])
+
+accuracy_overall = accuracy.groupby(['Team'], as_index = False)[['Shots_on_Target','Goals_Scored']].sum()
+accuracy_overall['Accuracy'] = (accuracy_overall['Goals_Scored']/accuracy_overall['Shots_on_Target'])*100
+accuracy_overall.columns
+```
+
+```{python}
+# Create a color gradient based on 'Shots_on_Target'
+color_scale = px.colors.sequential.Plasma  # You can choose any other color scale
+
+# Create the scatter plot with color gradient
+fig13 = px.scatter(accuracy_overall, x='Goals_Scored', y='Shots_on_Target', text='Team',
+                   color='Team', color_continuous_scale=color_scale)
+fig13.update_traces(textposition='top center')  # Set mode to 'markers' to disable lines between markers
+
+# Update layout for aesthetics, axis reversal, white high-contrast background, and no lines
+fig13.update_layout(
+    height=850,
+    width=1100,
+    title_text='Most Effective Team',
+    # xaxis_title="Goals Scored",
+    # yaxis_title="Shots on Target",
+    # xaxis=dict(autorange='reversed'),
+    # plot_bgcolor='rgba(0, 0, 0, 0)'  # White background
+    # # paper_bgcolor='pink',  # White paper background for high contrast
+    xaxis=dict(autorange='reversed', gridcolor='lightgray'),
+    yaxis=dict(gridcolor='lightgray'),
+    plot_bgcolor='lightyellow',  # Light yellow background
+    paper_bgcolor='white',  # White paper background for high contrast
+    font=dict(color='black'),  # Black color for labels
+)
+
+fig13.show()
+```
+
+```{python}
+accuracy = accuracy.groupby(['Year','Team'], as_index = False)[['Shots_on_Target','Goals_Scored']].sum()
+accuracy['Accuracy'] = (accuracy['Goals_Scored']/accuracy['Shots_on_Target'])*100
+# accuracy.columns
+```
+
+```{python}
+# Create scatter plot with color by 'Year'
+fig = px.scatter(accuracy, x='Year', y='Shots_on_Target', color='Goals_Scored',
+                 title='Shots on Target vs Goals Scored by Year',
+                 labels={'Shots_on_Target': 'Shots on Target', 'Goals_Scored': 'Goals Scored'},
+                 hover_data=['Team', 'Accuracy'])
+
+fig.show()
+```
+
+```{python}
+# # Create scatter plot with color by 'Year'
+# fig = px.scatter(accuracy, x='Goals_Scored', y='Shots_on_Target', color='Year',
+#                  title='Shots on Target vs Goals Scored by Year',
+#                  labels={'Shots_on_Target': 'Shots on Target', 'Goals_Scored': 'Goals Scored'},
+#                  hover_data=['Team', 'Accuracy'])
+
+# fig.show()
+
+
+# Create scatter plot with color by 'Year' and animation by 'Year'
+fig = px.scatter(accuracy, x='Goals_Scored', y='Shots_on_Target', color='Year',
+                 title='Shots on Target vs Goals Scored by Year',
+                 labels={'Shots_on_Target': 'Shots on Target', 'Goals_Scored': 'Goals Scored'},
+                 hover_data=['Team', 'Accuracy'],
+                 animation_frame='Year')
+
+fig.show()
+```
+
+```{python}
+# Melt the DataFrame to have 'Year' as the index and 'variable' for 'Shots_on_Target' and 'Goals_Scored'
+accuracy_yearwise = accuracy.groupby(['Year'],as_index = False)[['Goals_Scored','Shots_on_Target']].sum()
+accuracy_yearwise
+```
+
+```{python}
+# Melt the DataFrame to have 'Year' as the index and 'variable' for 'Shots_on_Target' and 'Goals_Scored'
+df_melted = accuracy_yearwise.melt(id_vars=['Year'], value_vars=['Shots_on_Target', 'Goals_Scored'], 
+                     var_name='Metric', value_name='Value')
+
+# # Create double bar graph (grouped bars) with different colors for each metric and dark background
+# fig = px.bar(df_melted, x='Year', y='Value', color='Metric',
+#              title='Shots on Target and Goals Scored Year-wise',
+#              labels={'Value': 'Value', 'Year': 'Year', 'Metric': 'Metric'},
+#              barmode='group')  # 'group' mode for grouped bars
+
+# fig.update_layout(
+#     plot_bgcolor='rgba(0, 0, 0, 0)',  # Transparent plot background
+#     paper_bgcolor='#000000',  # Black background
+#     font_color='#39ff14'  # Neon green font color for text
+# )
+
+# Create double bar graph (grouped bars) with different colors for each metric and light background
+fig = px.bar(df_melted, x='Year', y='Value', color='Metric',
+             title='Shots on Target and Goals Scored Year-wise',
+             labels={'Value': 'Value', 'Year': 'Year', 'Metric': 'Metric'},
+             barmode='group')  # 'group' mode for grouped bars
+
+# Update layout for a light background and more attractive styling
+fig.update_layout(
+    plot_bgcolor='rgb(240, 240, 240)',  # Light gray plot background
+    paper_bgcolor='rgb(255, 255, 255)',  # White paper background
+    font_color='rgb(10, 10, 10)',  # Dark font color for text
+    title_font_size=20,  # Increase title font size
+    title_font_family='Arial',  # Set title font family
+    legend_title_font_size=16,  # Increase legend title font size
+    legend_font_size=12,  # Increase legend font size
+    xaxis_title_font_size=14,  # Increase x-axis title font size
+    yaxis_title_font_size=14,  # Increase y-axis title font size
+)
+
+fig.show()
+```
+
+```{python}
+goals_scored = pd.read_csv(r'09_01_Goals_Scored.csv')
+# goals_scored
+goals_conceded = pd.read_csv(r'09_02_Goals_Conceded.csv')
+# goals_conceded
+
+performance = pd.merge(goals_scored, goals_conceded, 'left', on = ['Year','Team'])
+assert performance.shape[0] == goals_scored.shape[0], 'Duplicates after Join'
+performance_team = performance.groupby(['Team'], as_index = False)[['Goals_Scored','Goals_Conceded']].sum()
+# performance_team
+```
+
+```{python}
+# Create a color gradient based on 'Shots_on_Target'
+color_scale = px.colors.sequential.Plasma  # You can choose any other color scale
+
+# Create the scatter plot with color gradient
+fig13 = px.scatter(performance_team, x='Goals_Scored', y='Goals_Conceded', text='Team',
+                   color='Team', color_continuous_scale=color_scale)
+fig13.update_traces(textposition='top center')  # Set mode to 'markers' to disable lines between markers
+
+# Update layout for aesthetics, axis reversal, white high-contrast background, and no lines
+fig13.update_layout(
+    height=850,
+    width=1100,
+    title_text='Performance of Teams - Goals Conceded Vs Goals Scored',
+    xaxis_title="Goals Scored",
+    yaxis_title="Goals Conceded",
+    # # xaxis=dict(autorange='reversed')
+    # plot_bgcolor='rgba(0, 0, 0, 0)',  # White background
+    # paper_bgcolor='pink',  # White paper background for high contrast
+)
+
+fig13.show()
+```
+
+```{python}
+fouls_home = df[['Year','Home_Team','Home_Team_Fouls_Commited']].rename(columns = {'Home_Team':'Team','Home_Team_Fouls_Commited':'Fouls'})
+fouls_away = df[['Year','Away_Team','Away_Team_Fouls_Commited']].rename(columns = {'Away_Team':'Team','Away_Team_Fouls_Commited':'Fouls'})
+fouls_df = pd.concat([fouls_home,fouls_away])
+fouls_df = fouls_df.groupby(['Year','Team'], as_index = False)['Fouls'].sum()
+fouls_df
+```
+
+```{python}
+# Create live bar graph for foul count by team and year
+
+fig = px.bar(fouls_df, x='Team', y='Fouls', color='Team', animation_frame='Year',
+             title='Foul Count by Team and Year (Excluding Zero Counts)',
+             labels={'Foul': 'Foul Count', 'Team': 'Team', 'Year': 'Year'})
+
+fig.show()
+```
+
+```{python}
+fouls_overall = fouls_df.groupby(['Year'],as_index = False)['Fouls'].sum()
+fouls_overall
+```
+
+```{python}
+px.defaults.template = 'plotly_dark'
+# Create the colored bar chart using Plotly Express
+fig = px.bar(fouls_overall, x = 'Year', y = 'Fouls', color = 'Year', 
+             title = 'Number of Fouls Every Season')
+
+fig.update_xaxes(title = 'Season')
+fig.update_yaxes(title = 'Number of Fouls', tickmode='linear', dtick=100)
+
+
+# Show the plot
+fig.show()
+
+# Set the dark template
+px.defaults.template = 'plotly_dark'
+# px.defaults.template = 'plotly_darkgrid'
+
+# Create the colorful line plot using Plotly Express
+fig = px.line(fouls_overall, x='Year', y='Fouls', title='Trend Fouls Commited Over Seasons',
+              color_discrete_sequence=px.colors.qualitative.Plotly)
+
+# Update axis labels
+fig.update_xaxes(title='Season')
+fig.update_yaxes(title='Total number Of Fouls Season')
+
+# Show the plot
+fig.show()
+```

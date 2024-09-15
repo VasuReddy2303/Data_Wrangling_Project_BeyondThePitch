@@ -1,0 +1,29 @@
+---
+title: '8: External services'
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.16.1
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
+See <https://bellecp.github.io/597-Data-Wrangling-Spring-2024/project.html#backup-of-the-raw-and-tidied-data-on-external-storage-service>.
+Describe your contributions below.
+
+* * *
+
+The provided Python script focuses on backing up EPL multiple formats, including MongoDB, JSON, and CSV.
+
+This code uploads the data in to mongo db, this is demonstrated in qmd 06 and qmd 07. 
+
+Backup to MongoDB
+The databackup_mongodb function connects to a MongoDB database using the specified URI and server API version.
+Igroups all the rows andnd converts each group into a JSON format suitable for MongoDB documents.
+For eaUnique keySIN, the script either inserts a new document or updates an existing one in the MongoDB collection based on tUniqueSIN key.
+

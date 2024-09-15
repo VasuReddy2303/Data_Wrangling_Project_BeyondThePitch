@@ -1,0 +1,201 @@
+Year,Team,Goals_Conceded
+14-15,Arsenal,36.0
+14-15,Aston Villa,57.0
+14-15,Burnley,53.0
+14-15,Chelsea,32.0
+14-15,Crystal Palace,51.0
+14-15,Everton,50.0
+14-15,Hull,51.0
+14-15,Leicester,55.0
+14-15,Liverpool,48.0
+14-15,Man City,38.0
+14-15,Man United,37.0
+14-15,Newcastle,63.0
+14-15,QPR,73.0
+14-15,Southampton,33.0
+14-15,Stoke,45.0
+14-15,Sunderland,53.0
+14-15,Swansea,49.0
+14-15,Tottenham,53.0
+14-15,West Brom,51.0
+14-15,West Ham,47.0
+15-16,Arsenal,36.0
+15-16,Aston Villa,76.0
+15-16,Bournemouth,67.0
+15-16,Chelsea,53.0
+15-16,Crystal Palace,51.0
+15-16,Everton,55.0
+15-16,Leicester,36.0
+15-16,Liverpool,50.0
+15-16,Man City,41.0
+15-16,Man United,35.0
+15-16,Newcastle,65.0
+15-16,Norwich,67.0
+15-16,Southampton,41.0
+15-16,Stoke,55.0
+15-16,Sunderland,62.0
+15-16,Swansea,52.0
+15-16,Tottenham,35.0
+15-16,Watford,50.0
+15-16,West Brom,48.0
+15-16,West Ham,51.0
+16-17,Arsenal,44.0
+16-17,Bournemouth,67.0
+16-17,Burnley,55.0
+16-17,Chelsea,33.0
+16-17,Crystal Palace,63.0
+16-17,Everton,44.0
+16-17,Hull,80.0
+16-17,Leicester,63.0
+16-17,Liverpool,42.0
+16-17,Man City,39.0
+16-17,Man United,29.0
+16-17,Middlesbrough,53.0
+16-17,Southampton,48.0
+16-17,Stoke,56.0
+16-17,Sunderland,69.0
+16-17,Swansea,70.0
+16-17,Tottenham,26.0
+16-17,Watford,68.0
+16-17,West Brom,51.0
+16-17,West Ham,64.0
+17-18,Arsenal,51.0
+17-18,Bournemouth,61.0
+17-18,Brighton,54.0
+17-18,Burnley,39.0
+17-18,Chelsea,38.0
+17-18,Crystal Palace,55.0
+17-18,Everton,58.0
+17-18,Huddersfield,58.0
+17-18,Leicester,60.0
+17-18,Liverpool,38.0
+17-18,Man City,27.0
+17-18,Man United,28.0
+17-18,Newcastle,47.0
+17-18,Southampton,56.0
+17-18,Stoke,68.0
+17-18,Swansea,56.0
+17-18,Tottenham,36.0
+17-18,Watford,64.0
+17-18,West Brom,56.0
+17-18,West Ham,68.0
+18-19,Arsenal,51.0
+18-19,Bournemouth,70.0
+18-19,Brighton,60.0
+18-19,Burnley,68.0
+18-19,Cardiff,69.0
+18-19,Chelsea,39.0
+18-19,Crystal Palace,53.0
+18-19,Everton,46.0
+18-19,Fulham,81.0
+18-19,Huddersfield,76.0
+18-19,Leicester,48.0
+18-19,Liverpool,22.0
+18-19,Man City,23.0
+18-19,Man United,54.0
+18-19,Newcastle,48.0
+18-19,Southampton,65.0
+18-19,Tottenham,39.0
+18-19,Watford,59.0
+18-19,West Ham,55.0
+18-19,Wolves,46.0
+19-20,Arsenal,48.0
+19-20,Aston Villa,67.0
+19-20,Bournemouth,65.0
+19-20,Brighton,54.0
+19-20,Burnley,50.0
+19-20,Chelsea,54.0
+19-20,Crystal Palace,50.0
+19-20,Everton,56.0
+19-20,Leicester,41.0
+19-20,Liverpool,33.0
+19-20,Man City,35.0
+19-20,Man United,36.0
+19-20,Newcastle,58.0
+19-20,Norwich,75.0
+19-20,Sheffield United,39.0
+19-20,Southampton,60.0
+19-20,Tottenham,47.0
+19-20,Watford,64.0
+19-20,West Ham,62.0
+19-20,Wolves,40.0
+20-21,Arsenal,39.0
+20-21,Aston Villa,46.0
+20-21,Brighton,46.0
+20-21,Burnley,55.0
+20-21,Chelsea,36.0
+20-21,Crystal Palace,66.0
+20-21,Everton,48.0
+20-21,Fulham,53.0
+20-21,Leeds,54.0
+20-21,Leicester,50.0
+20-21,Liverpool,42.0
+20-21,Man City,32.0
+20-21,Man United,44.0
+20-21,Newcastle,62.0
+20-21,Sheffield United,63.0
+20-21,Southampton,68.0
+20-21,Tottenham,45.0
+20-21,West Brom,76.0
+20-21,West Ham,47.0
+20-21,Wolves,52.0
+21-22,Arsenal,48.0
+21-22,Aston Villa,54.0
+21-22,Brentford,56.0
+21-22,Brighton,44.0
+21-22,Burnley,53.0
+21-22,Chelsea,33.0
+21-22,Crystal Palace,46.0
+21-22,Everton,66.0
+21-22,Leeds,79.0
+21-22,Leicester,59.0
+21-22,Liverpool,26.0
+21-22,Man City,26.0
+21-22,Man United,57.0
+21-22,Newcastle,62.0
+21-22,Norwich,84.0
+21-22,Southampton,67.0
+21-22,Tottenham,40.0
+21-22,Watford,77.0
+21-22,West Ham,51.0
+21-22,Wolves,43.0
+22-23,Arsenal,43.0
+22-23,Aston Villa,46.0
+22-23,Bournemouth,71.0
+22-23,Brentford,46.0
+22-23,Brighton,53.0
+22-23,Chelsea,47.0
+22-23,Crystal Palace,49.0
+22-23,Everton,57.0
+22-23,Fulham,53.0
+22-23,Leeds,78.0
+22-23,Leicester,68.0
+22-23,Liverpool,47.0
+22-23,Man City,33.0
+22-23,Man United,43.0
+22-23,Newcastle,33.0
+22-23,Nott'm Forest,68.0
+22-23,Southampton,73.0
+22-23,Tottenham,63.0
+22-23,West Ham,55.0
+22-23,Wolves,58.0
+23-24,Arsenal,28.0
+23-24,Aston Villa,53.0
+23-24,Bournemouth,63.0
+23-24,Brentford,60.0
+23-24,Brighton,57.0
+23-24,Burnley,74.0
+23-24,Chelsea,59.0
+23-24,Crystal Palace,57.0
+23-24,Everton,49.0
+23-24,Fulham,55.0
+23-24,Liverpool,38.0
+23-24,Luton,78.0
+23-24,Man City,33.0
+23-24,Man United,55.0
+23-24,Newcastle,56.0
+23-24,Nott'm Forest,63.0
+23-24,Sheffield United,100.0
+23-24,Tottenham,58.0
+23-24,West Ham,70.0
+23-24,Wolves,60.0

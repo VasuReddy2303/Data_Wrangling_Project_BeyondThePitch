@@ -1,0 +1,25 @@
+---
+title: '12: Webpage'
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.16.1
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
+<https://bellecp.github.io/597-Data-Wrangling-Spring-2024/project.html#creation-web-page-to-communicate-your-project-methodology-analysis>.
+Describe your contributions below.
+
+* * *
+
+### The code has been published in QUARTO
+Please find the link here : **https://stats-at-rutgers.github.io/group-project-one00nine/10_statistical_ML.html**
+
+To publish the website, we utilized the Quarto Publish GitHub Action, which streamlined the process of generating and deploying manually. This action automatically builds the website from our Quarto files and publishes it online for easy access
+

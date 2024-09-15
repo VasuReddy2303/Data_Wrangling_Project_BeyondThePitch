@@ -1,0 +1,56 @@
+---
+title: '3: From raw to tabular data'
+---
+
+See <https://bellecp.github.io/597-Data-Wrangling-Spring-2024/project.html#store-your-data-in-at-least-3-different-formats-e.g.-sqlite3-csv-excel>.
+
+Describe your contributions below.
+
+* * *
+
+
+
+### Data Source Description:
+##### 1) The data is available in CSV format, making it easily accessible and compatible for analysis.
+##### 2) To import the data into a pandas DataFrame, the built-in method "read_csv" can be utilized, streamlining the process and facilitating efficient data manipulation.
+
+
+```{python}
+###### CODE Snippet #######
+
+# The data is accessible via the following link, formatted as comma-separated values (CSV): "https://www.football-data.co.uk/englandm.php"
+# Import and use pandas to input the data and transform in to a pandas dataframe.
+
+import pandas as pd
+
+df = pd.read_csv(r'https://www.football-data.co.uk/mmz4281/2324/E0.csv')
+
+# Using the r prefix before a string literal in Python (e.g., r'string') indicates a raw string, which treats backslashes \ as literal characters rather than interpreting them as escape sequences
+
+df.head()
+# len(df.columns)
+```
+
+### Some more information on importing the dataset.
+##### 1. Each CSV file contains data for an entire season
+##### 2. The data from each of the last 10 seasons will be extracted as required for analysis purpose
+##### 3. Each season comprises a distinct dataset, necessitating the extraction and subsequent merging of each dataset into a comprehensive cumulative dataset.
+
+---
+
+### Here are the steps for importing the data and creating a final DataFrame without the specific code:
+
+##### 1. **Import Data Individually:**
+   - Use the provided link to access and download each season's data as separate CSV files.
+
+##### 2. **Create a Base DataFrame:**
+   - Start with an empty DataFrame that will act as the base DataFrame for merging.
+
+##### 3. **Merge Imported Datasets:**
+   - As you download each season's data, merge it into the base DataFrame. Use the appropriate merging technique (e.g., concatenation) to combine the data from different seasons into a single DataFrame.
+
+##### 4. **Final DataFrame:**
+   - Once all seasons' data is merged into the base DataFrame, you will have a final DataFrame that comprises data from all seasons. This final DataFrame will be ready for analysis and further processing.
+
+By following these steps, we can effectively import, merge, and create a comprehensive DataFrame containing data from all seasons for your analysis needs.
+

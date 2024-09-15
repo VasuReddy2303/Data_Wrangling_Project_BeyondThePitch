@@ -1,0 +1,276 @@
+---
+title: '5: Data cleaning'
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.16.1
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
+See <https://bellecp.github.io/597-Data-Wrangling-Spring-2024/project.html#store-your-data-in-at-least-3-different-formats-e.g.-sqlite3-csv-excel>.
+
+Describe your contributions below.
+
+* * *
+
+### Data Cleaning steps detailed procedure:
+1. Column Transformation
+2. Standardizing Data Formats
+3. Handling Missing Values
+4. Inspection and Handling of Duplicates
+6. Data Transformation
+
+### Import required Libraries
+
+```{python}
+import pandas as pd
+import numpy as np
+import json
+# import dask as dd
+# import open
+```
+
+### Import Data 
+
+```{python}
+df_04 = pd.read_csv('Premier_league_data_Prepared_04.csv')
+pd.set_option('display.max_columns', None)
+df_04.head()
+```
+
+### 1. Column Transformation : Renaming Columns With Explicit Column Names
+
+```{python}
+## Extracting columns from the dataset to enhance understandability by renaming them.
+columns = df_04.columns.tolist()
+columns = {i:'' for i in columns}
+# print(columns)
+```
+
+```{python}
+## create a dictionary to define mapping of the columns
+columns_mapping = {'Div': 'Division', 'Date': 'Date', 'Time': 'Time', 'HomeTeam': 'Home_Team', 'AwayTeam': 'Away_Team',
+                  'Year' : 'Year', 'FTHG': 'Full_Time_Home_Goals', 'FTAG': 'Full_Time_Away_Goals',
+                  'FTR': 'Full_Time_Result', 'HTHG': 'Half_Time_Home_Goals', 'HTAG': 'Half_Time_Away_Goals', 'HTR': 'Half_Time_Result',
+                  'Referee': 'Referee', 'HS': 'Home_Team_Shots', 'AS': 'Away_Team_Shots',
+                  'HST': 'Home_Team_Shots_On_Target', 'AST': 'Away_Team_Shots_On_Target',
+                  'HF': 'Home_Team_Fouls_Commited', 'AF': 'Away_Team_Fouls_Commited', 'HC': 'Home_Team_Corners', 'AC': 'Away_Team_Corners',
+                  'HY': 'Home_Team_Yellow_Cards', 'AY': 'Away_Team_Yellow_Cards', 'HR': 'Home_Team_Red_Cards', 'AR': 'Away_Team_Red_Cards'}
+
+
+## Refining Column Names for Clearer Understanding
+df_04 = df_04.rename(columns = columns_mapping)
+# df_04
+```
+
+### 2. Handling Missing Values
+
+```{python}
+## Check for blank rows
+
+print('Total Records:', df_04.shape)
+
+nan_rows = df_04[df_04.isna().all(axis=1)]
+print('Number of Blank Rows:', nan_rows.shape)
+
+df = df_04[~df_04.isna().all(axis=1)]
+print('Number of recrods after Dropping Blank rows:',df.shape)
+# cleaned_df = df.dropna(how='all')
+```
+
+```{python}
+## Dropping Inconsistent Records
+
+print('Total records:', df.shape)
+df_test = df[df['Home_Team'] == '0']
+print('Number of Inconsistent Records:' , df_test.shape)
+
+df1 = df[df['Home_Team'] != '0']
+print('Number of records after droppping inconsistent records', df1.shape)
+
+df_test = df1[df1['Home_Team'] == '0']
+# print(df_test.shape)
+assert df_test.shape[0] == 0 , 'Inconsistent Records Found'
+
+df = df1.copy(deep = True)
+```
+
+```{python}
+test = df[df['Home_Team'] == '0'] 
+test.shape
+```
+
+```{python}
+# Missing Values Check
+
+# Check for rows with at least one NaN or null value
+rows_with_null = df.isna().any(axis=1)
+
+# Filter the DataFrame to get rows with at least one NaN or null value
+rows_with_null_df = df[rows_with_null]
+# rows_with_null_df
+```
+
+```{python}
+# Fill null values in the DataFrame with 'na' inplace
+df['Time'] = df['Time'].fillna('00:00')
+df = df.fillna('0')
+assert not df.isna().any().any(), 'NaN or Missing Values Still Exist!'
+# Print the modified DataFrame with filled null values
+```
+
+```{python}
+# df['Time'].unique()
+```
+
+### 3. Standardizing Data Formats
+
+```{python}
+# Checking Column DataTypes
+# print(df.dtypes)
+```
+
+```{python}
+# Create different columns_list to Transform into respective DataTypes.
+
+# Define the columns and their desired data types
+str_columns = ['Division', 'Date', 'Time', 'Home_Team', 'Away_Team', 'Full_Time_Result', 'Half_Time_Result', 'Referee','Year']
+float_columns = list(set(df.columns) - set(str_columns))
+
+# Convert columns to string type
+df[str_columns] = df[str_columns].astype(str)
+
+# Convert columns to float type
+df[float_columns] = df[float_columns].astype(float)
+
+# df
+```
+
+### 4. Inspection and Handling of Duplicates
+
+```{python}
+# Check if there are duplicate rows. Drop if any duplicates are present
+num_duplicates = df[df.duplicated()].shape[0]
+print(f"\nNumber of duplicate rows: {num_duplicates}")
+
+# Drop duplicate rows if they exist
+if num_duplicates > 0:
+    df = df.drop_duplicates()
+
+    # Display the DataFrame after dropping duplicates
+    print("\nDataFrame after dropping duplicate rows:")
+    print(df)
+else:
+    print("\nNo duplicate rows found.")
+```
+
+### 5. Data Tranformation 
+
+```{python}
+# Select only the columns needed for transformation
+
+df1 = df[columns_mapping.values()]
+# df1
+```
+
+```{python}
+### Changing value H, A, D, in column FTR (Full Time Result) in Home, Away, Draw
+df1['Full_Time_Result'] = np.where(df1['Full_Time_Result'] == 'H',"HOME", np.where(df1['Full_Time_Result'] == 'A',"AWAY", "DRAW"))
+
+# df1['Full_Time_Result_HA'] = 'DRAW'
+# df1.loc[df1['Full_Time_Result'] == 'H', 'Full_Time_Result_HA'] = 'HOME'
+# df1.loc[df1['Full_Time_Result'] == 'A', 'Full_Time_Result_HA'] = 'AWAY'
+# df1['Full_Time_Result'] = df1['Full_Time_Result_HA']
+# df1 = df1.drop(columns=['Full_Time_Result_HA'])
+df1
+```
+
+```{python}
+### To identify the winner of each match: if "H"- the home team was the winner, if "A" the away team was the winner, else draw:
+df1['Winner'] = np.where(df1['Full_Time_Result'] == 'HOME',df1['Home_Team'], np.where(df1['Full_Time_Result'] == 'AWAY', df1['Away_Team'], "Draw"))
+df1
+```
+
+```{python}
+### To identify the result of each match: whether the home team won, the away team won, or drew:
+df1['Result'] = np.where(df1['Full_Time_Result'] == 'HOME','Home Team Win',
+                          np.where(df1['Full_Time_Result'] == 'AWAY', 'Away Team Win', "Draw"))
+
+df1
+```
+
+```{python}
+### To identify how many goals did the winner had
+```
+
+```{python}
+# ### To get the "Year" of each match:
+# df1['Year']=pd.DatetimeIndex(df1['Date']).year
+
+### To get the total number of goals in each match and the goal differences:
+df1['Total_Goals_Scored'] = df1['Full_Time_Home_Goals'] + df1['Full_Time_Away_Goals']
+df1['Goal_Difference_Home_Team']= df1['Full_Time_Home_Goals']- df1['Full_Time_Away_Goals']
+df1['Goal_Difference_Away_Team']= df1['Full_Time_Away_Goals']- df1['Full_Time_Home_Goals']
+df1
+```
+
+```{python}
+df1["Unique_Key"] = df1["Division"] + "-" + df1["Date"] + "-" + df1["Time"] + "-" + df1["Home_Team"] + "-" + df1["Away_Team"]
+df1
+```
+
+### Save the Intermediate output
+
+```{python}
+# df1.to_csv('..\05_Premier_league_Data_Cleaned.csv',index = False)
+df1[df1['Home_Team'] != '0'].to_csv('Premier_league_Data_Cleaned_05.csv', index=False)
+df1.to_json(r'Premier_league_Data_Cleaned_05.json', orient='records')
+df1.to_excel(r'Premier_league_Data_Cleaned_05.xlsx', index = False)
+```
+
+### Connect and Upload Backup Data to Mongo DB
+
+```{python}
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+
+uri = "mongodb+srv://fv121:Vasureddy2303@hw2cluster.zpracso.mongodb.net/?retryWrites=true&w=majority&appName=HW2Cluster"
+
+# Create a new client and connect to the server
+client = MongoClient(uri, server_api=ServerApi('1'))
+
+# Send a ping to confirm a successful connection
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
+```
+
+```{python}
+db = client["premier-league-db"] # database name
+```
+
+```{python}
+collection = db["pl-data"] # table name
+```
+
+```{python}
+with open(r'Premier_league_Data_Cleaned_05.json', 'r') as file:
+    data = json.load(file)
+
+json_data = df.to_json(orient='records')
+# collection.insert_many(data, upsert=True)
+
+for document in data:
+    unique_key = {'_id': document['Unique_Key']}
+    collection.update_one(unique_key, {'$set': document}, upsert=True)
+
+print('DATA UPLOADED TO MONGO DB SUCCESSFULLY')
+```

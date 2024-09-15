@@ -1,0 +1,132 @@
+---
+title: '4: Data enrichment'
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.16.1
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
+See <https://bellecp.github.io/597-Data-Wrangling-Spring-2024/project.html#store-your-data-in-at-least-3-different-formats-e.g.-sqlite3-csv-excel>.
+
+Describe your contributions below.
+
+* * *
+
+1. The overarching objective is to conduct a comprehensive analysis of various statistics and records within the English Premier League.
+2. Data enrichment commences with the systematic extraction of data from disparate datasets corresponding to each season, culminating in their amalgamation into a unified dataset.
+3. Subsequently, the data undergoes rigorous cleaning processes, including but not limited to enhancing column readability and addressing null/NA values, to ensure its integrity and analytical suitability.
+
+**DATA EXTRACTION, ACQUISTION AND PREPARATION OF THE FINAL DATASET**
+
+To prepare the final dataset, we need to extract Premier League statistics for each individual season from separate links and then merge them into a unified dataframe for further analysis. This process ensures a comprehensive dataset that captures the statistics across multiple seasons for a holistic view of Premier League performance over recent years.
+
+**Below are the refined steps for preparing the final dataset**:
+
+1. Obtain Premier League statistics for the current year from the designated link: "https://www.football-data.co.uk/mmz4281/2324/E0.csv".
+2. Compile a chronological list of seasons based on the specified number of years for data extraction.
+3. Organize the data by season and integrate it with the information acquired in step 1, resulting in the creation of a consolidated dataframe as the final dataset.
+
+### Get the current year for calculating the number of seasons
+
+```{python}
+from datetime import datetime
+import pandas as pd
+from pymongo import MongoClient
+```
+
+```{python}
+# Get the current year
+current_year = datetime.now().year
+
+print("Current Year:", current_year)
+```
+
+#### ENTER THE NUMBER OF SEASONS HERE TO INCLUDE THE DATASETS FROM THE PAST AS PER THE ANALYSIS REQUIREMENTS
+
+```{python}
+number_of_seasons = 10
+```
+
+```{python}
+start_year = current_year - number_of_seasons
+# print(start_year,'\n')
+
+# seasons_list consists of all the premier league seasons considered for analysis
+seasons_list = []
+
+# include all the seasons in the seasons_list
+for year in range(start_year,current_year):
+    season = str(year)[-2:] + str(year+1)[-2:]
+    # print(season)
+    seasons_list.append(season)
+    
+print(seasons_list)
+```
+
+### Data acquisition from the website
+
+```{python}
+# Obtain the link to the dataset using the combination of the website link and the seasons_list ("https://www.football-data.co.uk/mmz4281/2324/E0.csv")
+website_link = 'https://www.football-data.co.uk/mmz4281/'
+website_filename = '/E0.csv'
+current_season_data_link = website_link + seasons_list[-1] + website_filename
+print('current_season_data_link: ',current_season_data_link ,'\n')
+```
+
+```{python}
+## Retrieve and import the data for the current season to establish the foundational DataFrame, which will serve as the anchor for merging datasets from subsequent seasons.
+# import pandas as pd
+
+df = pd.read_csv(current_season_data_link)
+df['Year'] = seasons_list[-1][:2] + '-' + seasons_list[-1][2:]
+df.head()
+```
+
+```{python}
+## Function to extract data from the website and merge
+def import_dataset(link):
+    print('Starting to import the data from the link:', link)
+    df_season = pd.read_csv(link)
+    print('Data imported')
+    return df_season
+
+## Function to merge the datasets
+def merge_datasets(df,df_season):
+    print('starting to merge the season_data')
+    df = pd.concat([df,df_season])
+    print('Data Merged')
+    return df
+```
+
+```{python}
+# import all seasons data and merge it with the dataframe above(df).
+for season in seasons_list[:-1]:
+    print('\nseason = ', season)
+    season_dataset_link = website_link + str(season) + website_filename
+    df_season = import_dataset(season_dataset_link)
+    df_season['Year'] = season[:2] + '-' + season[2:]
+    df = merge_datasets(df,df_season)
+
+# df.shape
+```
+
+### The dataframe 'df' comprises data spanning multiple past seasons, with the number of seasons determined by the specified duration.
+
+```{python}
+df.shape
+```
+
+```{python}
+#df.style
+```
+
+```{python}
+df.to_csv('Premier_league_data_Prepared_04.csv',index = False)
+```

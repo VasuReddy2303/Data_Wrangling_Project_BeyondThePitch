@@ -1,0 +1,749 @@
+---
+title: '10: Statistical analisys'
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.16.1
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
+<https://bellecp.github.io/597-Data-Wrangling-Spring-2024/project.html#data-analysis>
+Describe your contributions below.
+
+* * *
+
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+# import seaborn as sns
+import plotly.express as px
+import plotly.graph_objects as go
+```
+
+### Plots for different Data
+
+```{python}
+### 1) Regression Slope for Goals Scored
+
+df1 = pd.read_csv(r"09_01_Goals_Scored.csv")
+df1['Year'] = df1['Year'].str.replace('-','')
+df1['Year']  = df1['Year'].astype(int)
+the_big_six = ['Man City','Man United','Arsenal','Liverpool','Chelsea','Tottenham']
+df_big_six = df1[df1['Team'].isin(the_big_six)]
+df_big_six.columns
+
+
+# Set a custom color scale
+custom_color_scale = px.colors.sequential.Plasma
+tickvals = df_big_six['Year'].unique()
+
+# Create the scatter plot with Regression plot using Plotly Express
+fig = px.scatter(df_big_six, x='Year', y='Goals_Scored', color='Team',
+                 title='Regression Plot for Goals Scored by Team over Years',
+                 color_continuous_scale=custom_color_scale,
+                 trendline='ols',  # Add trendline for regression
+                 template='plotly_dark')  # Set the dark template
+
+# Update axis labels
+fig.update_layout(
+    xaxis_title='Season',
+    yaxis_title='Goals Scored',
+    xaxis=dict(
+        tickmode='array',  # Set tick mode to array
+        tickvals=tickvals,  # Specify the tick values as the unique years
+        ticktext=[str(year) for year in tickvals]  # Convert tick values to string for display
+    )
+)
+
+# Show the plot
+fig.show()
+
+
+############# HEAT MAP ##############
+# Pivot the DataFrame to create a matrix suitable for heatmap
+heatmap_data = df_big_six.pivot(index='Team', columns='Year', values='Goals_Scored')
+
+# Transpose the heatmap data to swap the axis
+heatmap_data = heatmap_data.T
+
+# Create the heatmap using Plotly graph objects
+fig = go.Figure(data=go.Heatmap(
+                   z=heatmap_data.values.tolist(),
+                   x=heatmap_data.columns,
+                   y=heatmap_data.index,
+                   colorscale='Viridis'))  # Adjust colorscale for better visibility
+
+# Set axis labels and plot title
+fig.update_layout(
+    xaxis_title='Team',
+    yaxis_title='Season',
+    xaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.columns,  # Set the tick values to exact years
+        ticktext=heatmap_data.columns.astype(str),  # Convert years to string for tick labels
+    ),
+    yaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.index,  # Set the tick values to exact years
+        ticktext=heatmap_data.index.astype(str),  # Convert years to string for tick labels
+    ),
+    title='Heatmap of Goals Scored by Team over Years',
+    template='plotly_dark',  # Set the dark template
+    height=600,  # Increase the height of the plot
+    width=800,  # Increase the width of the plot
+    font=dict(
+        size=12  # Adjust font size for better visibility
+    )
+)
+
+# Show the plot
+fig.show()
+```
+
+#### Insights
+
+- Manchester City Remain the only team with scores the highest number of goals every season
+- Machester City, Liverpool and Arsenal are the Teams with increasing trend for goals scored every season
+- Chelsea's goals scoring statistics have been decling ever since.
+- Manchester United and Tottenham Hotspurs are the teams who score almost equal goals every season
+
+```{python}
+# Create the heatmap using Plotly graph objects
+fig = go.Figure(data=go.Heatmap(
+    z=heatmap_data.values.tolist(),
+    x=heatmap_data.columns,
+    y=heatmap_data.index,
+    colorscale='Plasma',
+    hoverongaps=False,  # Disable hover on gaps for better readability
+    hovertemplate='Goals Scored: %{z}<extra></extra>',  # Define hover template
+    text=heatmap_data.values.tolist(),  # Use text for annotations
+    zmin=0,  # Set the minimum value for color scale
+    zmax=100,  # Set the maximum value for color scale
+    colorbar=dict(
+        title='Goals Scored',  # Set colorbar title
+    )
+))
+
+# Update axis labels and plot title
+fig.update_layout(
+    xaxis_title='Team',
+    yaxis_title='Season',
+    xaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.columns,  # Set the tick values to exact years
+        ticktext=heatmap_data.columns.astype(str),  # Convert years to string for tick labels
+    ),
+    yaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.index,  # Set the tick values to exact years
+        ticktext=heatmap_data.index.astype(str),  # Convert years to string for tick labels
+    ),
+    title='Heatmap of Goals Scored by Team over Years',
+    template='plotly_dark',  # Set the dark template
+    height=600,  # Increase the height of the plot
+    width=800,  # Increase the width of the plot
+    font=dict(
+        size=12  # Adjust font size for better visibility
+    )
+)
+# Show the plot
+fig.show()
+```
+
+```{python}
+df_big_six
+```
+
+```{python}
+df1 = pd.read_csv(r'Premier_league_Data_Cleaned_05.csv')
+df1['Year'] = df1['Year'].str.replace('-','').astype(int)
+df1_home = df1[['Year','Home_Team']].rename(columns = {'Home_Team':'Team'})
+df1_away = df1[['Year','Away_Team']].rename(columns = {'Away_Team':'Team'})
+
+df12 = pd.concat([df1_home,df1_away])
+df12 = df12[df12['Team'].isin(the_big_six)]
+matches_count = df12.groupby(['Year', 'Team']).size().reset_index(name='Matches_Count')
+matches_count
+```
+
+### "In conclusion, each team consistently participated in 38 matches every season, even amidst the challenges posed by the COVID-19 pandemic."
+
+```{python}
+df_norm_goals = pd.merge(matches_count,df_big_six, how = 'left', on = ['Year','Team'])
+df_norm_goals
+```
+
+```{python}
+### 2) Regression Slope for Goals Conceeded
+
+df2 = pd.read_csv(r"09_02_Goals_Conceded.csv")
+# print(df1.columns)
+df2['Year'] = df2['Year'].str.replace('-','')
+df2['Year']  = df2['Year'].astype(int)
+the_big_six = ['Man City','Man United','Arsenal','Liverpool','Chelsea','Tottenham']
+df_big_six = df2[df2['Team'].isin(the_big_six)]
+df_big_six
+```
+
+```{python}
+# Set a custom color scale
+custom_color_scale = px.colors.sequential.Plasma
+tickvals = df_big_six['Year'].unique()
+
+# Create the scatter plot with Regression plot using Plotly Express
+fig = px.scatter(df_big_six, x='Year', y='Goals_Conceded', color='Team',
+                 title='Regression Plot for Goals Conceded by Team over Years',
+                 color_continuous_scale=custom_color_scale,
+                 trendline='ols',  # Add trendline for regression
+                 template='plotly_dark')  # Set the dark template
+
+# Update axis labels
+fig.update_layout(
+    xaxis_title='Season',
+    yaxis_title='Goals Conceded',
+    xaxis=dict(
+        tickmode='array',  # Set tick mode to array
+        tickvals=tickvals,  # Specify the tick values as the unique years
+        ticktext=[str(year) for year in tickvals]  # Convert tick values to string for display
+    )
+)
+
+# Show the plot
+fig.show()
+
+############# HEAT MAP ##############
+# Pivot the DataFrame to create a matrix suitable for heatmap
+heatmap_data = df_big_six.pivot(index='Team', columns='Year', values='Goals_Conceded')
+
+# Transpose the heatmap data to swap the axis
+heatmap_data = heatmap_data.T
+
+# Create the heatmap using Plotly graph objects
+fig = go.Figure(data=go.Heatmap(
+                   z=heatmap_data.values.tolist(),
+                   x=heatmap_data.columns,
+                   y=heatmap_data.index,
+                   # colorscale='RdBu',
+                   # colorscale = 'YlGnBu',
+                   # colorscale = 'Greys',
+                   colorscale = 'Plasma'))  # Adjust colorscale for better visibility
+
+# Set axis labels and plot title
+fig.update_layout(
+    xaxis_title='Team',
+    yaxis_title='Season',
+    xaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.columns,  # Set the tick values to exact years
+        ticktext=heatmap_data.columns.astype(str),  # Convert years to string for tick labels
+    ),
+    yaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.index,  # Set the tick values to exact years
+        ticktext=heatmap_data.index.astype(str),  # Convert years to string for tick labels
+    ),
+    title='Heatmap of Goals Conceded by Team over Years',
+    template='plotly_dark',  # Set the dark template
+    height=600,  # Increase the height of the plot
+    width=800,  # Increase the width of the plot
+    font=dict(
+        size=12  # Adjust font size for better visibility
+    )
+)
+
+# Show the plot
+fig.show()
+```
+
+#### Key Observations:
+- Manchester City and Liverpool have demonstrated notable improvements in their defensive performance over the years.
+- Arsenal consistently ranks among the teams with the least goals conceded each year, showcasing a strong defensive record, behind City and Liverpool.
+- Conversely, Chelsea, Manchester United, and Tottenham Hotspur have experienced defensive vulnerabilities over time.
+- Tottenham Hotspur stands out for their defensive struggles, having conceded the most goals among the top teams in the past four years.
+
+```{python}
+### 3) Regression Slope for Goal Difference
+
+df3 = pd.read_csv(r"09_03_Goal_Difference.csv")
+print(df3.columns)
+df3['Year'] = df3['Year'].str.replace('-','')
+df3['Year']  = df3['Year'].astype(int)
+# print(df3)
+the_big_six = ['Man City','Man United','Arsenal','Liverpool','Chelsea','Tottenham']
+df_big_six = df3[df3['Team'].isin(the_big_six)]
+# df_big_six
+```
+
+```{python}
+# Set a custom color scale
+custom_color_scale = px.colors.sequential.Plasma
+tickvals = df_big_six['Year'].unique()
+
+# Create the scatter plot with Regression plot using Plotly Express
+fig = px.scatter(df_big_six, x='Year', y='Goal_Difference', color='Team',
+                 title='Regression Plot for Goals Difference by Team over Years',
+                 color_continuous_scale=custom_color_scale,
+                 trendline='ols',  # Add trendline for regression
+                 template='plotly_dark')  # Set the dark template
+
+# Update axis labels
+fig.update_layout(
+    xaxis_title='Season',
+    yaxis_title='Goals Difference',
+    xaxis=dict(
+        tickmode='array',  # Set tick mode to array
+        tickvals=tickvals,  # Specify the tick values as the unique years
+        ticktext=[str(year) for year in tickvals]  # Convert tick values to string for display
+    )
+)
+
+# Show the plot
+fig.show()
+
+############# HEAT MAP ##############
+# Pivot the DataFrame to create a matrix suitable for heatmap
+heatmap_data = df_big_six.pivot(index='Team', columns='Year', values='Goal_Difference')
+
+# Transpose the heatmap data to swap the axis
+heatmap_data = heatmap_data.T
+
+# Create the heatmap using Plotly graph objects
+fig = go.Figure(data=go.Heatmap(
+                   z=heatmap_data.values.tolist(),
+                   x=heatmap_data.columns,
+                   y=heatmap_data.index,
+                   # colorscale='RdBu',
+                   # colorscale = 'YlGnBu',
+                   # colorscale = 'Greys',
+                   colorscale = 'Plasma'))  # Adjust colorscale for better visibility
+
+# Set axis labels and plot title
+fig.update_layout(
+    xaxis_title='Team',
+    yaxis_title='Season',
+    xaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.columns,  # Set the tick values to exact years
+        ticktext=heatmap_data.columns.astype(str),  # Convert years to string for tick labels
+    ),
+    yaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.index,  # Set the tick values to exact years
+        ticktext=heatmap_data.index.astype(str),  # Convert years to string for tick labels
+    ),
+    title='Heatmap of Goals Difference by Team over Years',
+    template='plotly_dark',  # Set the dark template
+    height=600,  # Increase the height of the plot
+    width=800,  # Increase the width of the plot
+    font=dict(
+        size=12  # Adjust font size for better visibility
+    )
+)
+
+# Show the plot
+fig.show()
+```
+
+```{python}
+### 4) Regrssion Plot for Wins
+
+df4 = pd.read_csv(r"09_04_Wins.csv")
+print(df4.columns)
+df4['Year'] = df4['Year'].str.replace('-','')
+df4['Year']  = df4['Year'].astype(int)
+the_big_six = ['Man City','Man United','Arsenal','Liverpool','Chelsea','Tottenham']
+df_big_six = df4[df4['Winner'].isin(the_big_six)]
+# df_big_six
+```
+
+```{python}
+# Set a custom color scale
+custom_color_scale = px.colors.sequential.Plasma
+tickvals = df_big_six['Year'].unique()
+
+# Create the scatter plot with regression plot using Plotly Express
+fig = px.scatter(df_big_six, x='Year', y='Wins', color='Winner',
+                 title='Regression Plot Number of Wins by Teams over the Years',
+                 color_continuous_scale=custom_color_scale,
+                 trendline='ols',  # Add trendline for regression
+                 template='plotly_dark')  # Set the dark template
+
+# Update axis labels
+fig.update_layout(
+    xaxis_title='Season',
+    yaxis_title='Wins',
+    xaxis=dict(
+        tickmode='array',  # Set tick mode to array
+        tickvals=tickvals,  # Specify the tick values as the unique years
+        ticktext=[str(year) for year in tickvals]  # Convert tick values to string for display
+    )
+)
+
+# Show the plot
+fig.show()
+
+############# HEAT MAP ##############
+# Pivot the DataFrame to create a matrix suitable for heatmap
+heatmap_data = df_big_six.pivot(index='Winner', columns='Year', values='Wins')
+
+# Transpose the heatmap data to swap the axis
+heatmap_data = heatmap_data.T
+
+# Create the heatmap using Plotly graph objects
+fig = go.Figure(data=go.Heatmap(
+                   z=heatmap_data.values.tolist(),
+                   x=heatmap_data.columns,
+                   y=heatmap_data.index,
+                   # colorscale='RdBu',
+                   # colorscale = 'YlGnBu',
+                   # colorscale = 'Greys',
+                   colorscale = 'Plasma'))  # Adjust colorscale for better visibility
+
+# Set axis labels and plot title
+fig.update_layout(
+    xaxis_title='Team',
+    yaxis_title='Season',
+    xaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.columns,  # Set the tick values to exact years
+        ticktext=heatmap_data.columns.astype(str),  # Convert years to string for tick labels
+    ),
+    yaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.index,  # Set the tick values to exact years
+        ticktext=heatmap_data.index.astype(str),  # Convert years to string for tick labels
+    ),
+    title='Heatmap of Wins by Teams over the Years',
+    template='plotly_dark',  # Set the dark template
+    height=600,  # Increase the height of the plot
+    width=800,  # Increase the width of the plot
+    font=dict(
+        size=12  # Adjust font size for better visibility
+    )
+)
+
+# Show the plot
+fig.show()
+```
+
+```{python}
+### 5) Regrssion Plot for Home Wins
+
+df5 = pd.read_csv(r"09_05_Home_Wins.csv")
+# print(df5.columns)
+df5['Year'] = df5['Year'].str.replace('-','')
+df5['Year']  = df5['Year'].astype(int)
+the_big_six = ['Man City','Man United','Arsenal','Liverpool','Chelsea','Tottenham']
+df_big_six = df5[df5['Winner'].isin(the_big_six)]
+# df_big_six
+```
+
+```{python}
+# Set a custom color scale
+custom_color_scale = px.colors.sequential.Plasma
+tickvals = df_big_six['Year'].unique()
+
+# Create the scatter plot with regression plot using Plotly Express
+fig = px.scatter(df_big_six, x='Year', y='Wins', color='Winner',
+                 title='Regression Plot Number of Home Wins by Teams over the Years',
+                 color_continuous_scale=custom_color_scale,
+                 trendline='ols',  # Add trendline for regression
+                 template='plotly_dark')  # Set the dark template
+
+# Update axis labels
+fig.update_layout(
+    xaxis_title='Season',
+    yaxis_title='Wins',
+    xaxis=dict(
+        tickmode='array',  # Set tick mode to array
+        tickvals=tickvals,  # Specify the tick values as the unique years
+        ticktext=[str(year) for year in tickvals]  # Convert tick values to string for display
+    )
+)
+
+# Show the plot
+fig.show()
+
+############# HEAT MAP ##############
+# Pivot the DataFrame to create a matrix suitable for heatmap
+heatmap_data = df_big_six.pivot(index='Winner', columns='Year', values='Wins')
+
+# Transpose the heatmap data to swap the axis
+heatmap_data = heatmap_data.T
+
+# Create the heatmap using Plotly graph objects
+fig = go.Figure(data=go.Heatmap(
+                   z=heatmap_data.values.tolist(),
+                   x=heatmap_data.columns,
+                   y=heatmap_data.index,
+                   # colorscale='RdBu',
+                   # colorscale = 'YlGnBu',
+                   # colorscale = 'Greys',
+                   colorscale = 'Plasma'))  # Adjust colorscale for better visibility
+
+# Set axis labels and plot title
+fig.update_layout(
+    xaxis_title='Team',
+    yaxis_title='Season',
+    xaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.columns,  # Set the tick values to exact years
+        ticktext=heatmap_data.columns.astype(str),  # Convert years to string for tick labels
+    ),
+    yaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.index,  # Set the tick values to exact years
+        ticktext=heatmap_data.index.astype(str),  # Convert years to string for tick labels
+    ),
+    title='Heatmap of Home Wins by Teams over the Years',
+    template='plotly_dark',  # Set the dark template
+    height=600,  # Increase the height of the plot
+    width=800,  # Increase the width of the plot
+    font=dict(
+        size=12  # Adjust font size for better visibility
+    )
+)
+
+# Show the plot
+fig.show()
+```
+
+```{python}
+### 6) Regression Plot for Home Losses
+
+df6 = pd.read_csv(r"09_06_Home_losses.csv")[['Year','Team','Losses']]
+# print(df6.columns)
+df6['Year'] = df6['Year'].str.replace('-','')
+df6['Year']  = df6['Year'].astype(int)
+the_big_six = ['Man City','Man United','Arsenal','Liverpool','Chelsea','Tottenham']
+df_big_six = df6[df6['Team'].isin(the_big_six)]
+# df_big_six
+```
+
+```{python}
+# Set a custom color scale
+custom_color_scale = px.colors.sequential.Plasma
+tickvals = df_big_six['Year'].unique()
+
+# Create the scatter plot with Regression plot using Plotly Express
+fig = px.scatter(df_big_six, x='Year', y='Losses', color='Team',
+                 title='Regression Plot Number of Losses by Teams over the Years',
+                 color_continuous_scale=custom_color_scale,
+                 trendline='ols',  # Add trendline for regression
+                 template='plotly_dark')  # Set the dark template
+
+# Update axis labels
+fig.update_layout(
+    xaxis_title='Season',
+    yaxis_title='Loses',
+    xaxis=dict(
+        tickmode='array',  # Set tick mode to array
+        tickvals=tickvals,  # Specify the tick values as the unique years
+        ticktext=[str(year) for year in tickvals]  # Convert tick values to string for display
+    )
+)
+
+# Show the plot
+fig.show()
+
+############# HEAT MAP ##############
+# Pivot the DataFrame to create a matrix suitable for heatmap
+heatmap_data = df_big_six.pivot(index='Team', columns='Year', values='Losses')
+
+# Transpose the heatmap data to swap the axis
+heatmap_data = heatmap_data.T
+
+# Create the heatmap using Plotly graph objects
+fig = go.Figure(data=go.Heatmap(
+                   z=heatmap_data.values.tolist(),
+                   x=heatmap_data.columns,
+                   y=heatmap_data.index,
+                   # colorscale='RdBu',
+                   # colorscale = 'YlGnBu',
+                   # colorscale = 'Greys',
+                   colorscale = 'Plasma'))  # Adjust colorscale for better visibility
+
+# Set axis labels and plot title
+fig.update_layout(
+    xaxis_title='Team',
+    yaxis_title='Season',
+    xaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.columns,  # Set the tick values to exact years
+        ticktext=heatmap_data.columns.astype(str),  # Convert years to string for tick labels
+    ),
+    yaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.index,  # Set the tick values to exact years
+        ticktext=heatmap_data.index.astype(str),  # Convert years to string for tick labels
+    ),
+    title='Heatmap of Losses by Teams over the Years',
+    template='plotly_dark',  # Set the dark template
+    height=600,  # Increase the height of the plot
+    width=800,  # Increase the width of the plot
+    font=dict(
+        size=12  # Adjust font size for better visibility
+    )
+)
+
+# Show the plot
+fig.show()
+```
+
+```{python}
+### 7) Regression Plot for Discipline
+
+df6 = pd.read_csv(r"09_07_Discipline.csv")
+# print(df6.columns)
+df6['Year'] = df6['Year'].str.replace('-','')
+df6['Year']  = df6['Year'].astype(int)
+the_big_six = ['Man City','Man United','Arsenal','Liverpool','Chelsea','Tottenham']
+df_big_six = df6[df6['Team'].isin(the_big_six)]
+# df_big_six
+```
+
+```{python}
+# Set a custom color scale
+custom_color_scale = px.colors.sequential.Plasma
+tickvals = df_big_six['Year'].unique()
+
+# Create the scatter plot with Regression plot using Plotly Express
+fig = px.scatter(df_big_six, x='Year', y='Yellow_Cards', color='Team',
+                 title='Regression Plot Number of Yellow Cards by Teams over the Years',
+                 color_continuous_scale=custom_color_scale,
+                 trendline='ols',  # Add trendline for regression
+                 template='plotly_dark')  # Set the dark template
+
+# Update axis labels
+fig.update_layout(
+    xaxis_title='Season',
+    yaxis_title='Wins',
+    xaxis=dict(
+        tickmode='array',  # Set tick mode to array
+        tickvals=tickvals,  # Specify the tick values as the unique years
+        ticktext=[str(year) for year in tickvals]  # Convert tick values to string for display
+    )
+)
+
+# Show the plot
+fig.show()
+
+############# HEAT MAP ##############
+# Pivot the DataFrame to create a matrix suitable for heatmap
+heatmap_data = df_big_six.pivot(index='Team', columns='Year', values='Yellow_Cards')
+
+# Transpose the heatmap data to swap the axis
+heatmap_data = heatmap_data.T
+
+# Create the heatmap using Plotly graph objects
+fig = go.Figure(data=go.Heatmap(
+                   z=heatmap_data.values.tolist(),
+                   x=heatmap_data.columns,
+                   y=heatmap_data.index,
+                   # colorscale='RdBu',
+                   # colorscale = 'YlGnBu',
+                   # colorscale = 'Greys',
+                   colorscale = 'Plasma'))  # Adjust colorscale for better visibility
+
+# Set axis labels and plot title
+fig.update_layout(
+    xaxis_title='Team',
+    yaxis_title='Season',
+    xaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.columns,  # Set the tick values to exact years
+        ticktext=heatmap_data.columns.astype(str),  # Convert years to string for tick labels
+    ),
+    yaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.index,  # Set the tick values to exact years
+        ticktext=heatmap_data.index.astype(str),  # Convert years to string for tick labels
+    ),
+    title='Heatmap of Yellow Cards by Teams over the Years',
+    template='plotly_dark',  # Set the dark template
+    height=600,  # Increase the height of the plot
+    width=800,  # Increase the width of the plot
+    font=dict(
+        size=12  # Adjust font size for better visibility
+    )
+)
+
+# Show the plot
+fig.show()
+```
+
+```{python}
+# Set a custom color scale
+custom_color_scale = px.colors.sequential.Plasma
+tickvals = df_big_six['Year'].unique()
+
+# Create the scatter plot with Regression plot using Plotly Express
+fig = px.scatter(df_big_six, x='Year', y='Red_Cards', color='Team',
+                 title='Regression Plot Number of Red Cards by Teams over the Years',
+                 color_continuous_scale=custom_color_scale,
+                 trendline='ols',  # Add trendline for regression
+                 template='plotly_dark')  # Set the dark template
+
+# Update axis labels
+fig.update_layout(
+    xaxis_title='Season',
+    yaxis_title='Wins',
+    xaxis=dict(
+        tickmode='array',  # Set tick mode to array
+        tickvals=tickvals,  # Specify the tick values as the unique years
+        ticktext=[str(year) for year in tickvals]  # Convert tick values to string for display
+    )
+)
+
+# Show the plot
+fig.show()
+
+############# HEAT MAP ##############
+# Pivot the DataFrame to create a matrix suitable for heatmap
+heatmap_data = df_big_six.pivot(index='Team', columns='Year', values='Red_Cards')
+
+# Transpose the heatmap data to swap the axis
+heatmap_data = heatmap_data.T
+
+# Create the heatmap using Plotly graph objects
+fig = go.Figure(data=go.Heatmap(
+                   z=heatmap_data.values.tolist(),
+                   x=heatmap_data.columns,
+                   y=heatmap_data.index,
+                   # colorscale='RdBu',
+                   # colorscale = 'YlGnBu',
+                   # colorscale = 'Greys',
+                   colorscale = 'Plasma'))  # Adjust colorscale for better visibility
+
+# Set axis labels and plot title
+fig.update_layout(
+    xaxis_title='Team',
+    yaxis_title='Season',
+    xaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.columns,  # Set the tick values to exact years
+        ticktext=heatmap_data.columns.astype(str),  # Convert years to string for tick labels
+    ),
+    yaxis=dict(
+        tickmode='array',  # Set tickmode to 'array' for custom tick values
+        tickvals=heatmap_data.index,  # Set the tick values to exact years
+        ticktext=heatmap_data.index.astype(str),  # Convert years to string for tick labels
+    ),
+    title='Heatmap of Red Cards by Teams over the Years',
+    template='plotly_dark',  # Set the dark template
+    height=600,  # Increase the height of the plot
+    width=800,  # Increase the width of the plot
+    font=dict(
+        size=12  # Adjust font size for better visibility
+    )
+)
+
+# Show the plot
+fig.show()
+```

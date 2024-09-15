@@ -1,0 +1,37 @@
+---
+title: '2: Retrieval of raw data'
+---
+
+See <https://bellecp.github.io/597-Data-Wrangling-Spring-2024/project.html#store-your-data-in-at-least-3-different-formats-e.g.-sqlite3-csv-excel>.
+
+Describe your contributions below.
+
+* * *
+
+
+### DATA AQUISITION
+
+##### 1) Data is retrieved using the CSV files. Data is readily available and accessable in the format of comma seperated values and is updated on a weekly basis on the website here : "https://www.football-data.co.uk/englandm.php"
+
+###### 2) CSV data files can be efficiently retrieved directly from their source by utilizing the file's link, a functionality seamlessly supported by pandas through the "read_csv" method.
+
+##### 3) By utilizing the file link directly, we can automate the data retrieval process. The files are updated on the website after every football match.
+
+##### 4) Below is the code snippet for the same. 
+
+```{python}
+########## CODE SNIPPET ##################
+
+import pandas as pd
+
+df = pd.read_csv('https://www.football-data.co.uk/mmz4281/2324/E0.csv')
+# df.head()
+df.style
+```
+
+### Some more information on importing the dataset.
+
+##### 1) Each CSV file contains data for an entire season.
+##### 2) The data from each of the last 10 seasons will be extracted as required for analysis purposes.
+##### 3) Each season comprises a distinct dataset, necessitating the extraction and subsequent merging of each dataset into a comprehensive cumulative dataset.
+

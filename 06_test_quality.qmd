@@ -1,0 +1,89 @@
+---
+title: '6: Test data quality'
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.16.1
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
+See <https://bellecp.github.io/597-Data-Wrangling-Spring-2024/project.html#tests-for-data-quality>.
+Describe your contributions below.
+
+* * *
+
+```{python}
+import pandas as pd
+```
+
+### Functions for Quality Checks
+
+```{python}
+def test_getdf():
+    df = pd.read_csv(r'Premier_league_Data_Cleaned_05.csv')
+    df = df[df['Home_Team'] != '0']
+    return df
+
+def test_record_count():
+    df = test_getdf()
+    print('Checking if records exist')
+    row_count = df.shape[0]
+    print("Number of Records: ", row_count)
+    assert record_count(df) != 0 , 'No Data in the file'
+    
+    # return row_count
+
+def test_null_records(df):
+    df = test_getdf()
+    print('Checking for Null Records')
+    # null_count = df[df.isnull()].shape[0]
+    null_count = df[df.isnull().all(axis=1)].shape[0]
+    print('Number of Null Records: ', null_count)
+    assert null_records(df) == 0, 'Null records in the data'
+    # return null_count
+
+def test_duplicate_check(df):
+    df = test_getdf()
+    print('Checking for Duplicate Recods')
+    duplicates_count = df.duplicated().sum()
+    print(f"Number of duplicated rows in the entire DataFrame: {duplicates_count}")
+    assert duplicate_check(df) == 0, 'Duplicates in the Data'
+    # return duplicates_count
+
+def test_nan_records(df):
+    df = test_getdf()
+    print('Checking for NaN Records')
+    nan_rows_count = df.isna().any(axis=1).sum()
+    print(f"Number of rows with at least one NaN value: {nan_rows_count}")
+    assert nan_records(df) == 0, 'NaN Values in the Data'
+    # return nan_rows_count
+
+def test_inconsistent_records(df):
+    df = test_getdf()
+    print('Checking for Inconsistent Records')
+    inconsistent_records = df[df['Home_Team'] == '0'].shape[0]
+    print('Number of Inconsistent records: ', inconsistent_records)
+    assert inconsistent_records(df) == 0, 'Inconsistent Records in the Data'
+    # return inconsistent_records
+```
+
+#### Check if the data exists
+
+
+#### Check for Null Records
+
+
+#### Check for Duplicates in the Data
+
+
+#### Check for Nan Values
+
+
+#### Check for Inconsistent Records
+

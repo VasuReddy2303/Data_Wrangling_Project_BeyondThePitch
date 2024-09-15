@@ -1,0 +1,34 @@
+---
+title: "1: Data Sources"
+---
+
+See <https://bellecp.github.io/597-Data-Wrangling-Spring-2024/project.html#store-your-data-in-at-least-3-different-formats-e.g.-sqlite3-csv-excel>.
+
+Describe your contributions below.
+
+* * *
+
+
+### Data Source and Description
+##### SOURCE : https://www.football-data.co.uk/englandm.php
+- The website mentioned is an open-source platform dedicated to gathering and archiving comprehensive data from the Premier League, providing an accessible and transparent repository for researchers, analysts, and enthusiasts to access, utilize, and analyze the wealth of information available. By offering this data openly, the platform promotes collaboration, innovation, and informed decision-making within the football community, fostering a deeper understanding and appreciation of the intricacies of Premier League matches, players, teams, and seasons.
+
+- Football/Soccer data for the top flight premier division of England - English Premier League. CSV data files to use for quantitative testing of betting systems and analysis of trends and patterns. 
+
+- Premier League data encompasses comprehensive statistics and information about matches, players, teams, and seasons, facilitating in-depth analysis and insights into football performance and trends.
+
+- The Premier League is one of the most prestigious and widely followed football leagues globally, showcasing top-tier football talent in England. Established in 1992, it has become renowned for its intense competition, high-profile clubs, and passionate fan base. Each season, teams compete fiercely for the coveted title, with matches filled with skillful gameplay, dramatic moments, and iconic rivalries. The league's popularity extends far beyond England, drawing millions of viewers worldwide and solidifying its position as a powerhouse in the world of football.
+
+- Delving into the intricate fabric of trends and patterns within one of the most fiercely competitive leagues in the footballing realm is not merely resonant but also captivatingly immersive. The dynamic interplay of strategies, performances, and outcomes within this league not only echoes across the sporting landscape but also offers a compelling narrative of evolution, resilience, and excellence, making it a captivating arena for analysis and exploration.
+
+### Data Source Facts
+
+- Data Type: CSV
+- Data Category : Sports - Soccer - Premier league - English Top Flight Division
+- Real-time data availability: Active
+- Data updation Cycle : after every matchday. 
+- Number of Fields/Attributes : 106 (columns) 
+- Number of Records(Number of total matches played) : 380 (rows) per season 
+
+### Data Format
+- The data is structured in CSV files, each file containing the statistics for a specific Premier League season. Our analysis will involve a comprehensive examination of trends spanning multiple seasons by amalgamating the data from these distinct CSV files, providing a rich and nuanced exploration of long-term patterns and dynamics within the league.

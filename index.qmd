@@ -1,0 +1,16 @@
+---
+title: "one00nine"
+---
+
+Use this website to summarize contributions to your Data-Wrangling group project. Publish this website on Github Pages so that instructors and TAs can easily see your contributions.
+
+See <https://bellecp.github.io/597-Data-Wrangling-Spring-2024/project.html#how-to-include-pythonnotebooks-files-in-your-qmd-pages> on how to include python files, notebook, notebook cells and outputs inside a quart website.
+
+# Team members
+
+Describe here each group member (netid and name).
+
+- pk732, Pradhyumna Kanth Goud Kasula
+- ssk241, Shreyash Kalal
+- ag2384, Adish Golechha
+- fv121, Fnu Vasureddy

@@ -1,0 +1,52 @@
+---
+title: '17: cont. testing'
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .qmd
+      format_name: quarto
+      format_version: '1.0'
+      jupytext_version: 1.16.1
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+---
+
+<https://bellecp.github.io/597-Data-Wrangling-Spring-2024/project.html#continuous-testing>.
+Describe your contributions below.
+
+* * *
+
+```{python}
+#### Git workflow to automatically trigger. 
+```
+
+name: Run pytest
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'  
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Replace with your requirements file if needed
+
+      - name: Run pytest
+        run: |
+          pytest
+
